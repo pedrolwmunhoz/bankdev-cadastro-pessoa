@@ -21,7 +21,7 @@ public class PessoaController {
     @Autowired
     private CadastroPessoaService cadastroPessoaService;
 
-    @GetMapping("/cadastrar")
+    @PostMapping("/cadastrar")
     public ResponseEntity<String> cadastrarPessoa(@RequestBody @Valid PessoaCadastroDTO pssoaCadastroDTO ) {
         try {
 
