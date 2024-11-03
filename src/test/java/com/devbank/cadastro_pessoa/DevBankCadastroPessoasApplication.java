@@ -1,4 +1,4 @@
-package com.devbank.cadastro_pessoa.cadastro_funcionarios;
+package com.devbank.cadastro_pessoa;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
