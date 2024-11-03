@@ -1,9 +1,18 @@
 package com.bankdev.cadastro_pessoa.services;
 
+import com.bankdev.cadastro_pessoa.dto.PessoaLoginReturnDTO;
+import com.bankdev.cadastro_pessoa.dto.PessoaFisicaDTO;
+import com.bankdev.cadastro_pessoa.dto.PessoaJuridicaDTO;
 import com.bankdev.cadastro_pessoa.models.HistoricoLogin;
 import com.bankdev.cadastro_pessoa.models.Login;
+import com.bankdev.cadastro_pessoa.models.Pessoa;
+import com.bankdev.cadastro_pessoa.models.PessoaFisica;
+import com.bankdev.cadastro_pessoa.models.PessoaJuridica;
 import com.bankdev.cadastro_pessoa.repositories.HistoricoLoginRepository;
 import com.bankdev.cadastro_pessoa.repositories.LoginRepository;
+import com.bankdev.cadastro_pessoa.repositories.PessoaRepository;
+import com.bankdev.cadastro_pessoa.repositories.PessoaFisicaRepository;
+import com.bankdev.cadastro_pessoa.repositories.PessoaJuridicaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +29,59 @@ public class LoginService {
     @Autowired
     private HistoricoLoginRepository historicoLoginRepository;
 
-    public boolean validarLogin(String email, String senha) {
+    @Autowired
+    private PessoaRepository pessoaRepository;
+
+    @Autowired
+    private PessoaFisicaRepository pessoaFisicaRepository;
+
+    @Autowired
+    private PessoaJuridicaRepository pessoaJuridicaRepository;
+
+    public PessoaLoginReturnDTO validarLogin(String email, String senha) {
         Optional<Login> loginOptional = loginRepository.findByEmail(email);
         boolean isValid = false;
+        PessoaLoginReturnDTO pessoaLoginReturnDTO = new PessoaLoginReturnDTO();
+
         if (loginOptional.isPresent()) {
             Login login = loginOptional.get();
             isValid = login.getSenha().equals(senha);
+            if (isValid) {
+                // Busca a pessoa associada ao login pelo email
+                Optional<Pessoa> pessoaOptional = pessoaRepository.findByEmail(email);
+                if (pessoaOptional.isPresent()) {
+                    Pessoa pessoa = pessoaOptional.get();
+                    if ("FISICA".equalsIgnoreCase(pessoa.getTipo())) {
+                        Optional<PessoaFisica> pessoaFisicaOptional = pessoaFisicaRepository.findById(pessoa.getIdPessoa());
+                        pessoaFisicaOptional.ifPresent(pf -> {
+                            PessoaFisicaDTO pessoaFisicaDTO = new PessoaFisicaDTO();
+                            pessoaFisicaDTO.setNome(pf.getNome());
+                            pessoaFisicaDTO.setIdade(pf.getIdade());
+                            pessoaFisicaDTO.setCpf(pf.getCpf());
+                            pessoaFisicaDTO.setEmail(pf.getEmail());
+                            pessoaFisicaDTO.setTipo(pf.getTipo());
+                            pessoaFisicaDTO.setTelefone(pf.getTelefone());
+                            pessoaLoginReturnDTO.setPessoaFisicaDTO(pessoaFisicaDTO);
+                        });
+                    } else if ("JURIDICA".equalsIgnoreCase(pessoa.getTipo())) {
+                        Optional<PessoaJuridica> pessoaJuridicaOptional = pessoaJuridicaRepository.findById(pessoa.getIdPessoa());
+                        pessoaJuridicaOptional.ifPresent(pj -> {
+                            PessoaJuridicaDTO pessoaJuridicaDTO = new PessoaJuridicaDTO();
+                            pessoaJuridicaDTO.setRazaoSocial(pj.getRazaoSocial());
+                            pessoaJuridicaDTO.setNomeFantasia(pj.getNomeFantasia());
+                            pessoaJuridicaDTO.setCnpj(pj.getCnpj());
+                            pessoaJuridicaDTO.setEmail(pj.getEmail());
+                            pessoaJuridicaDTO.setTipo(pj.getTipo());
+                            pessoaJuridicaDTO.setTelefone(pj.getTelefone());
+                            pessoaLoginReturnDTO.setPessoaJuridicaDTO(pessoaJuridicaDTO);
+                        });
+                    }
+                }
+            }
         }
+
         cadastrarHistoricoLogin(loginOptional, isValid);
-        return isValid;
+        return pessoaLoginReturnDTO;
     }
 
     private void cadastrarHistoricoLogin(Optional<Login> loginOptional, boolean isValid) {

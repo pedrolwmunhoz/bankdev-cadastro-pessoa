@@ -1,5 +1,6 @@
 package com.bankdev.cadastro_pessoa.controller;
 
+import com.bankdev.cadastro_pessoa.dto.PessoaLoginReturnDTO;
 import com.bankdev.cadastro_pessoa.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,12 +18,12 @@ public class LoginController {
     private LoginService loginService;
 
     @GetMapping("/validar")
-    public ResponseEntity<String> validarLogin(@RequestParam String email, @RequestParam String senha) {
+    public ResponseEntity<Object> validarLogin(@RequestParam String email, @RequestParam String senha) {
 
-        boolean isValid = loginService.validarLogin(email, senha);
+        PessoaLoginReturnDTO pessoaLoginReturnDTO = loginService.validarLogin(email, senha);
 
-        if (isValid) {
-            return ResponseEntity.ok("Login válido");
+        if (pessoaLoginReturnDTO.getPessoaFisicaDTO() != null || pessoaLoginReturnDTO.getPessoaJuridicaDTO() != null) {
+            return ResponseEntity.ok(pessoaLoginReturnDTO);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
         }
