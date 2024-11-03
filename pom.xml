@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cit.virtual-ponto</groupId>
-	<artifactId>registro-ponto-funcionario</artifactId>
+	<artifactId>devbank-cadastro-pessoa</artifactId>
 	<version>1.0.0</version>
-	<name>cadastro-pessoa</name>
+	<name>devbank-cadastro-pessoa</name>
 	<description>Microserviço para controle e cadastro de pessoa no devBank</description>
 	<url/>
 	<licenses>
