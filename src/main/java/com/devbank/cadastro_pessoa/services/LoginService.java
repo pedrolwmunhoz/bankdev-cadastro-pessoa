@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.devbank.cadastro_pessoa.dto.PessoaFisicaDTO;
 import com.devbank.cadastro_pessoa.dto.PessoaJuridicaDTO;
 import com.devbank.cadastro_pessoa.dto.PessoaLoginResponseDTO;
+import com.devbank.cadastro_pessoa.dto.SaldoDTO;
 import com.devbank.cadastro_pessoa.models.HistoricoLogin;
 import com.devbank.cadastro_pessoa.models.Login;
 import com.devbank.cadastro_pessoa.models.Pessoa;
@@ -20,7 +21,6 @@ import com.devbank.cadastro_pessoa.repositories.PessoaRepository;
 import com.devbank.cadastro_pessoa.repositories.SaldoRepository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 
@@ -74,6 +74,7 @@ public class LoginService {
                             Optional <Saldo> optionalSaldo = saldoRepository.findByPessoa(pf);
                             if(optionalSaldo.isPresent()){
                                 Saldo saldo = optionalSaldo.get();
+                                pessoaLoginResponseDTO.setSaldoDTO(new SaldoDTO());
                                 pessoaLoginResponseDTO.getSaldoDTO().setSaldoAtual(saldo.getSaldoAtual());
                                 pessoaLoginResponseDTO.getSaldoDTO().setLimiteCredito(saldo.getLimiteCredito());
                                 pessoaLoginResponseDTO.getSaldoDTO().setDataUltimaAtualizacao(LocalDate.now());
@@ -95,6 +96,7 @@ public class LoginService {
                             Optional <Saldo> optionalSaldo = saldoRepository.findByPessoa(pj);
                             if(optionalSaldo.isPresent()){
                                 Saldo saldo = optionalSaldo.get();
+                                pessoaLoginResponseDTO.setSaldoDTO(new SaldoDTO());
                                 pessoaLoginResponseDTO.getSaldoDTO().setSaldoAtual(saldo.getSaldoAtual());
                                 pessoaLoginResponseDTO.getSaldoDTO().setLimiteCredito(saldo.getLimiteCredito());
                                 pessoaLoginResponseDTO.getSaldoDTO().setDataUltimaAtualizacao(LocalDate.now());
