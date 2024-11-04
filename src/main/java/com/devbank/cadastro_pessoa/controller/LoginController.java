@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.devbank.cadastro_pessoa.dto.PessoaLoginReturnDTO;
+import com.devbank.cadastro_pessoa.dto.PessoaLoginResponseDTO;
 import com.devbank.cadastro_pessoa.services.LoginService;
 
 @RestController
@@ -21,10 +21,10 @@ public class LoginController {
     @GetMapping("/validar")
     public ResponseEntity<Object> validarLogin(@RequestParam String email, @RequestParam String senha) {
 
-        PessoaLoginReturnDTO pessoaLoginReturnDTO = loginService.validarLogin(email, senha);
+        PessoaLoginResponseDTO pessoaLoginResponseDTO = loginService.validarLogin(email, senha);
 
-        if (pessoaLoginReturnDTO.getPessoaFisicaDTO() != null || pessoaLoginReturnDTO.getPessoaJuridicaDTO() != null) {
-            return ResponseEntity.ok(pessoaLoginReturnDTO);
+        if (pessoaLoginResponseDTO.getPessoaFisicaDTO() != null || pessoaLoginResponseDTO.getPessoaJuridicaDTO() != null) {
+            return ResponseEntity.ok(pessoaLoginResponseDTO);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
         }

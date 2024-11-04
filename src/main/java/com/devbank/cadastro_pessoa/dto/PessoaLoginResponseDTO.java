@@ -1,14 +1,15 @@
 package com.devbank.cadastro_pessoa.dto;
 
 import lombok.Data;
-import jakarta.validation.Valid;
 
 @Data
-public class PessoaLoginReturnDTO {
+public class PessoaLoginResponseDTO {
 
-    @Valid
+    private Integer idPessoa;
+
+    private SaldoDTO saldoDTO;
+
     private PessoaFisicaDTO pessoaFisicaDTO;
     
-    @Valid
     private PessoaJuridicaDTO pessoaJuridicaDTO;
 }

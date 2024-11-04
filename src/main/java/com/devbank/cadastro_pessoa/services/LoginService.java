@@ -5,19 +5,22 @@ import org.springframework.stereotype.Service;
 
 import com.devbank.cadastro_pessoa.dto.PessoaFisicaDTO;
 import com.devbank.cadastro_pessoa.dto.PessoaJuridicaDTO;
-import com.devbank.cadastro_pessoa.dto.PessoaLoginReturnDTO;
+import com.devbank.cadastro_pessoa.dto.PessoaLoginResponseDTO;
 import com.devbank.cadastro_pessoa.models.HistoricoLogin;
 import com.devbank.cadastro_pessoa.models.Login;
 import com.devbank.cadastro_pessoa.models.Pessoa;
 import com.devbank.cadastro_pessoa.models.PessoaFisica;
 import com.devbank.cadastro_pessoa.models.PessoaJuridica;
+import com.devbank.cadastro_pessoa.models.Saldo;
 import com.devbank.cadastro_pessoa.repositories.HistoricoLoginRepository;
 import com.devbank.cadastro_pessoa.repositories.LoginRepository;
 import com.devbank.cadastro_pessoa.repositories.PessoaFisicaRepository;
 import com.devbank.cadastro_pessoa.repositories.PessoaJuridicaRepository;
 import com.devbank.cadastro_pessoa.repositories.PessoaRepository;
+import com.devbank.cadastro_pessoa.repositories.SaldoRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 
@@ -26,6 +29,9 @@ public class LoginService {
 
     @Autowired
     private LoginRepository loginRepository;
+
+    @Autowired
+    private SaldoRepository saldoRepository;
 
     @Autowired
     private HistoricoLoginRepository historicoLoginRepository;
@@ -39,10 +45,10 @@ public class LoginService {
     @Autowired
     private PessoaJuridicaRepository pessoaJuridicaRepository;
 
-    public PessoaLoginReturnDTO validarLogin(String email, String senha) {
+    public PessoaLoginResponseDTO validarLogin(String email, String senha) {
         Optional<Login> loginOptional = loginRepository.findByEmail(email);
         boolean isValid = false;
-        PessoaLoginReturnDTO pessoaLoginReturnDTO = new PessoaLoginReturnDTO();
+        PessoaLoginResponseDTO pessoaLoginResponseDTO = new PessoaLoginResponseDTO();
 
         if (loginOptional.isPresent()) {
             Login login = loginOptional.get();
@@ -62,7 +68,16 @@ public class LoginService {
                             pessoaFisicaDTO.setEmail(pf.getEmail());
                             pessoaFisicaDTO.setTipo(pf.getTipo());
                             pessoaFisicaDTO.setTelefone(pf.getTelefone());
-                            pessoaLoginReturnDTO.setPessoaFisicaDTO(pessoaFisicaDTO);
+                            pessoaLoginResponseDTO.setPessoaFisicaDTO(pessoaFisicaDTO);
+                            pessoaLoginResponseDTO.setIdPessoa(pf.getIdPessoa());
+
+                            Optional <Saldo> optionalSaldo = saldoRepository.findByPessoa(pf);
+                            if(optionalSaldo.isPresent()){
+                                Saldo saldo = optionalSaldo.get();
+                                pessoaLoginResponseDTO.getSaldoDTO().setSaldoAtual(saldo.getSaldoAtual());
+                                pessoaLoginResponseDTO.getSaldoDTO().setLimiteCredito(saldo.getLimiteCredito());
+                                pessoaLoginResponseDTO.getSaldoDTO().setDataUltimaAtualizacao(LocalDate.now());
+                            }
                         });
                     } else if ("JURIDICA".equalsIgnoreCase(pessoa.getTipo())) {
                         Optional<PessoaJuridica> pessoaJuridicaOptional = pessoaJuridicaRepository.findById(pessoa.getIdPessoa());
@@ -74,7 +89,16 @@ public class LoginService {
                             pessoaJuridicaDTO.setEmail(pj.getEmail());
                             pessoaJuridicaDTO.setTipo(pj.getTipo());
                             pessoaJuridicaDTO.setTelefone(pj.getTelefone());
-                            pessoaLoginReturnDTO.setPessoaJuridicaDTO(pessoaJuridicaDTO);
+                            pessoaLoginResponseDTO.setPessoaJuridicaDTO(pessoaJuridicaDTO);
+                            pessoaLoginResponseDTO.setIdPessoa(pj.getIdPessoa());
+
+                            Optional <Saldo> optionalSaldo = saldoRepository.findByPessoa(pj);
+                            if(optionalSaldo.isPresent()){
+                                Saldo saldo = optionalSaldo.get();
+                                pessoaLoginResponseDTO.getSaldoDTO().setSaldoAtual(saldo.getSaldoAtual());
+                                pessoaLoginResponseDTO.getSaldoDTO().setLimiteCredito(saldo.getLimiteCredito());
+                                pessoaLoginResponseDTO.getSaldoDTO().setDataUltimaAtualizacao(LocalDate.now());
+                            }
                         });
                     }
                 }
@@ -82,7 +106,7 @@ public class LoginService {
         }
 
         cadastrarHistoricoLogin(loginOptional, isValid);
-        return pessoaLoginReturnDTO;
+        return pessoaLoginResponseDTO;
     }
 
     private void cadastrarHistoricoLogin(Optional<Login> loginOptional, boolean isValid) {
