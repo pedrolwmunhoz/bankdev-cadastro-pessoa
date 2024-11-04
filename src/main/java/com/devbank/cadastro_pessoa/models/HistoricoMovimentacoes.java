@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "historico_movimentacoes")
 @Data
@@ -14,6 +16,7 @@ public class HistoricoMovimentacoes {
     private Integer idMovimentacao;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "id_saldo", nullable = false)
     private Saldo saldo;
 
